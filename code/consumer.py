@@ -13,9 +13,11 @@ def handle_rdd(rdd):
         global ss
         print(rdd)
         df = ss.createDataFrame(rdd, schema=['text', 'words', 'length'])
+        print("New tweets insert")
         df.show()
-        df.write.mode("append").insertInto('default.zozo')
-        ss.sql("SELECT * FROM default.zozo ORDER BY words desc limit 1").show()
+        df.write.mode("append").insertInto('default.tweets')
+        print("##### The Tweet Has The max number of words")
+        ss.sql("SELECT * FROM default.tweets ORDER BY words desc limit 1").show()
 
 
 sc = SparkContext(appName="BDT523")
@@ -31,7 +33,7 @@ ss = SparkSession.builder \
 
 ss.sparkContext.setLogLevel('WARN')
 
-ss.sql("CREATE TABLE IF NOT EXISTS  default.zozo ( text STRING, words INT, length INT )")
+ss.sql("CREATE TABLE IF NOT EXISTS  default.tweets ( text STRING, words INT, length INT )")
 
 ks = KafkaUtils.createStream(ssc, 'zookeeper:2181', 'Spark-Streaming', {'TWITTER-TWEETS-CS523': 10})
 lines = ks.map(lambda v: json.loads(v[1]))
